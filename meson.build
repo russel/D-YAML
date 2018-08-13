@@ -1,10 +1,15 @@
-project('D-YAML', 'd',
-    meson_version: '>=0.40.0',
+# -*- mode: python; -*-
+
+project(
+    'D-YAML',
+    'd',
+    meson_version: '>=0.41.0',
     subproject_dir: 'contrib',
-    version: '0.7.0'
+    version: '0.7.0',
+    default_options: ['buildtype=release'],
 )
 
-project_soversion    = '0'
+project_soversion = '0'
 
 src_dir = include_directories('source/')
 pkgc = import('pkgconfig')
@@ -48,19 +53,24 @@ install_subdir('source/dyaml', install_dir: 'include/d/yaml/')
 
 tinyendian_dep = dependency('tinyendian', version: '>=0.2.0', fallback: ['tinyendian', 'tinyendian_dep'])
 
-dyaml_lib = library('dyaml',
-        [dyaml_src],
-        include_directories: [src_dir],
-        dependencies: [tinyendian_dep],
-        install: true,
-        version: meson.project_version(),
-        soversion: project_soversion
+library_name = 'dyaml'
+
+dyaml_lib = library(
+    library_name,
+    [dyaml_src],
+    include_directories: [src_dir],
+    dependencies: [tinyendian_dep],
+    install: true,
+    version: meson.project_version(),
+    soversion: project_soversion
 )
-pkgc.generate(name: 'dyaml',
-              libraries: dyaml_lib,
-              subdirs: 'd/yaml/',
-              version: meson.project_version(),
-              description: 'YAML parser and emitter for the D programming language.'
+
+pkgc.generate(
+    name: library_name,
+    libraries: dyaml_lib,
+    subdirs: 'd/yaml/',
+    version: meson.project_version(),
+    description: 'YAML parser and emitter for the D programming language.'
 )
 
 # Make D-YAML easy to use as subproject
