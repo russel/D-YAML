@@ -9,8 +9,6 @@ project(
     default_options: ['buildtype=release'],
 )
 
-project_soversion = '0'
-
 src_dir = include_directories('source/')
 pkgc = import('pkgconfig')
 
@@ -62,7 +60,7 @@ dyaml_lib = library(
     dependencies: [tinyendian_dep],
     install: true,
     version: meson.project_version(),
-    soversion: project_soversion
+    pic: true,
 )
 
 pkgc.generate(
