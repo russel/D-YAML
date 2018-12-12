@@ -5,7 +5,7 @@ project(
     'd',
     meson_version: '>=0.41.0',
     subproject_dir: 'contrib',
-    version: '0.7.0',
+    version: '0.7.1',
     default_options: ['buildtype=release'],
 )
 
@@ -34,6 +34,10 @@ dyaml_src = [
     'source/dyaml/serializer.d',
     'source/dyaml/style.d',
     'source/dyaml/tagdirective.d',
+    'source/dyaml/token.d'
+]
+
+dyaml_test_src = [
     'source/dyaml/test/common.d',
     'source/dyaml/test/compare.d',
     'source/dyaml/test/constructor.d',
@@ -44,9 +48,9 @@ dyaml_src = [
     'source/dyaml/test/representer.d',
     'source/dyaml/test/resolver.d',
     'source/dyaml/test/tokens.d',
-    'source/dyaml/token.d'
 ]
-install_subdir('source/dyaml', install_dir: 'include/d/yaml/')
+
+install_headers(dyaml_src, install_dir: 'include/d/dyaml/')
 
 tinyendian_dep = dependency('tinyendian', version: '>=0.2.0', fallback: ['tinyendian', 'tinyendian_dep'])
 
