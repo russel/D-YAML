@@ -41,8 +41,6 @@ struct Loader
         Parser parser_;
         // Resolves tags (data types).
         Resolver resolver_;
-        // Constructs YAML data types.
-        Constructor constructor_;
         // Name of the input file or stream, used in error messages.
         string name_ = "<unknown>";
         // Are we done loading?
@@ -154,7 +152,7 @@ struct Loader
             try
             {
                 reader_      = new Reader(yamlData);
-                scanner_     = new Scanner(reader_);
+                scanner_     = Scanner(reader_);
                 parser_      = new Parser(scanner_);
             }
             catch(YAMLException e)
@@ -175,12 +173,6 @@ struct Loader
         void resolver(Resolver resolver) pure @safe nothrow @nogc
         {
             resolver_ = resolver;
-        }
-
-        /// Specify custom Constructor to use.
-        void constructor(Constructor constructor) pure @safe nothrow @nogc
-        {
-            constructor_ = constructor;
         }
 
         /** Load single YAML document.
@@ -230,7 +222,7 @@ struct Loader
             if (!rangeInitialized)
             {
                 lazyInitConstructorResolver();
-                composer = new Composer(parser_, resolver_, constructor_);
+                composer = Composer(parser_, resolver_);
                 rangeInitialized = true;
             }
             assert(!done_, "Loader.popFront called on empty range");
@@ -301,7 +293,6 @@ struct Loader
         void lazyInitConstructorResolver() @safe
         {
             if(resolver_ is null)    { resolver_    = new Resolver(); }
-            if(constructor_ is null) { constructor_ = new Constructor(); }
         }
 }
 /// Load single YAML document from a file:
@@ -410,13 +401,11 @@ struct Loader
         "Hello world!\n"~
         "...\n"
     );
-    auto constructor = new Constructor();
     auto resolver = new Resolver();
 
     // Add constructor functions / resolver expressions here...
 
     auto loader = Loader.fromFile("example.yaml");
-    loader.constructor = constructor;
     loader.resolver = resolver;
     auto rootNode = loader.load();
 }
