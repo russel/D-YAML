@@ -143,51 +143,26 @@ struct Dumper
          * Throws:  YAMLException on error (e.g. invalid nodes,
          *          unable to write to file/stream).
          */
-        void dump(CharacterType = char, Range)(Range range, Node[] documents ...) @trusted
+        void dump(CharacterType = char, Range)(Range range, Node[] documents ...)
             if (isOutputRange!(Range, CharacterType) &&
                 isOutputRange!(Range, char) || isOutputRange!(Range, wchar) || isOutputRange!(Range, dchar))
         {
             try
             {
                 auto emitter = new Emitter!(Range, CharacterType)(range, canonical, indent_, textWidth, lineBreak);
-                auto serializer = Serializer!(Range, CharacterType)(emitter, resolver, explicitStart ? Yes.explicitStart : No.explicitStart,
+                auto serializer = Serializer(resolver, explicitStart ? Yes.explicitStart : No.explicitStart,
                                              explicitEnd ? Yes.explicitEnd : No.explicitEnd, YAMLVersion, tags_);
+                serializer.startStream(emitter);
                 foreach(ref document; documents)
                 {
                     auto data = representData(document, defaultScalarStyle, defaultCollectionStyle);
-                    serializer.serialize(data);
+                    serializer.serialize(emitter, data);
                 }
+                serializer.endStream(emitter);
             }
             catch(YAMLException e)
             {
                 throw new YAMLException("Unable to dump YAML to stream "
-                                        ~ name ~ " : " ~ e.msg, e.file, e.line);
-            }
-        }
-
-    package:
-        /*
-         * Emit specified events. Used for debugging/testing.
-         *
-         * Params:  events = Events to emit.
-         *
-         * Throws:  YAMLException if unable to emit.
-         */
-        void emit(CharacterType = char, Range, T)(Range range, T events) @safe
-            if (isInputRange!T && is(ElementType!T == Event) &&
-                isOutputRange!(Range, char) || isOutputRange!(Range, wchar) || isOutputRange!(Range, dchar))
-        {
-            try
-            {
-                auto emitter = Emitter!(Range, CharacterType)(range, canonical, indent_, textWidth, lineBreak);
-                foreach(ref event; events)
-                {
-                    emitter.emit(event);
-                }
-            }
-            catch(YAMLException e)
-            {
-                throw new YAMLException("Unable to emit YAML to stream "
                                         ~ name ~ " : " ~ e.msg, e.file, e.line);
             }
         }
