@@ -5,8 +5,7 @@ project(
     'd',
     meson_version: '>=0.41.0',
     subproject_dir: 'contrib',
-    version: '0.7.1',
-    default_options: ['buildtype=release'],
+    version: '0.8.0'
 )
 
 src_dir = include_directories('source/')
